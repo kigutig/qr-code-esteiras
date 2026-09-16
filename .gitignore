@@ -14,3 +14,21 @@ __v0_jsx-dev-runtime.ts
 node_modules
 .next/
 .DS_Store
+
+# Testes e cobertura
+coverage/
+.jest-cache/
+
+# Relatórios de segurança (gerados localmente, não commitar)
+npm-audit-report.json
+trivy-results.sarif
+semgrep-results.sarif
+snyk.sarif
+license-report.json
+
+# Lighthouse CI
+.lighthouseci/
+
+# Build artifacts
+out/
+dist/

@@ -1,0 +1,18 @@
+# .snyk — Política de segurança Snyk
+# Define exceções documentadas para vulnerabilidades conhecidas e aceitas.
+
+version: v1.25.0
+
+# Vulnerabilidades ignoradas com justificativa
+ignore:
+  # Exemplo de exceção (descomente e ajuste quando necessário):
+  # SNYK-JS-XLSX-XXXX:
+  #   - '*':
+  #       reason: "Vulnerabilidade em xlsx@0.18.x - biblioteca usada apenas no client-side para export, sem exposição a inputs não confiáveis."
+  #       expires: 2027-01-01T00:00:00.000Z
+
+# Patches automáticos
+patch: {}
+
+# Thresholds de severidade que bloqueiam o CI
+# (configurado no workflow security.yml: --severity-threshold=high)

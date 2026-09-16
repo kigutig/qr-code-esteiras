@@ -1,0 +1,48 @@
+{
+  "extends": "next/core-web-vitals",
+  "plugins": ["security", "no-secrets"],
+  "rules": {
+    // ── eslint-plugin-security ────────────────────────────────────────────────
+    "security/detect-object-injection": "warn",
+    "security/detect-non-literal-regexp": "warn",
+    "security/detect-unsafe-regex": "error",
+    "security/detect-buffer-noassert": "error",
+    "security/detect-child-process": "error",
+    "security/detect-disable-mustache-escape": "error",
+    "security/detect-eval-with-expression": "error",
+    "security/detect-new-buffer": "error",
+    "security/detect-no-csrf-before-method-override": "error",
+    "security/detect-possible-timing-attacks": "warn",
+    "security/detect-pseudoRandomBytes": "error",
+    "security/detect-non-literal-fs-filename": "warn",
+    "security/detect-non-literal-require": "warn",
+
+    // ── eslint-plugin-no-secrets ──────────────────────────────────────────────
+    "no-secrets/no-secrets": ["error", {
+      "tolerance": 4.2,
+      "ignoreContent": [
+        "example",
+        "placeholder",
+        "test",
+        "mock",
+        "dummy"
+      ]
+    }],
+
+    // ── Regras gerais de segurança ────────────────────────────────────────────
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "no-script-url": "error"
+  },
+  "overrides": [
+    {
+      // Testes podem usar padrões que parecem "secrets" (são mocks)
+      "files": ["**/__tests__/**/*", "**/*.test.*", "**/*.spec.*", "**/jest.setup.*"],
+      "rules": {
+        "no-secrets/no-secrets": "off",
+        "security/detect-object-injection": "off"
+      }
+    }
+  ]
+}

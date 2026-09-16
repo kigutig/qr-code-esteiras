@@ -1,0 +1,67 @@
+# Dependabot — Atualizações automáticas de dependências
+# Mantém npm packages e GitHub Actions sempre atualizados
+
+version: 2
+updates:
+  # ── npm packages ───────────────────────────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    # Agrupa updates para reduzir PRs
+    groups:
+      radix-ui:
+        patterns:
+          - "@radix-ui/*"
+      testing:
+        patterns:
+          - "jest*"
+          - "@jest/*"
+          - "@testing-library/*"
+          - "babel-jest"
+          - "@babel/*"
+      firebase:
+        patterns:
+          - "firebase"
+          - "firebase-admin"
+      types:
+        patterns:
+          - "@types/*"
+      nextjs:
+        patterns:
+          - "next"
+          - "@next/*"
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Ignorar versões major (breaking changes)
+    ignore:
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  # ── GitHub Actions ─────────────────────────────────────────────────────────
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    commit-message:
+      prefix: "ci(deps)"

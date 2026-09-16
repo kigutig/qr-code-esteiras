@@ -1,0 +1,39 @@
+# CODEOWNERS — Revisores obrigatórios por área do código
+# Cada linha define um padrão de arquivo e quem deve revisar os PRs que os modificam.
+# Substitua @seu-usuario pelo seu usuário GitHub real.
+
+# ── Global (fallback) ──────────────────────────────────────────────────────────
+*                           @seu-usuario
+
+# ── CI/CD e DevSecOps ─────────────────────────────────────────────────────────
+.github/                    @seu-usuario
+.github/workflows/          @seu-usuario
+.snyk                       @seu-usuario
+lighthouserc.js             @seu-usuario
+
+# ── Infraestrutura Firebase ────────────────────────────────────────────────────
+firebase.json               @seu-usuario
+firebase.rules.json         @seu-usuario
+.firebaserc                 @seu-usuario
+
+# ── Core da aplicação ──────────────────────────────────────────────────────────
+lib/                        @seu-usuario
+middleware.ts               @seu-usuario
+next.config.mjs             @seu-usuario
+
+# ── Tipos e modelos de dados ────────────────────────────────────────────────────
+lib/types.ts                @seu-usuario
+types/                      @seu-usuario
+
+# ── Autenticação e segurança ────────────────────────────────────────────────────
+contexts/                   @seu-usuario
+app/login/                  @seu-usuario
+
+# ── Testes ─────────────────────────────────────────────────────────────────────
+__tests__/                  @seu-usuario
+jest.config.js              @seu-usuario
+jest.setup.js               @seu-usuario
+
+# ── Dependências ───────────────────────────────────────────────────────────────
+package.json                @seu-usuario
+package-lock.json           @seu-usuario

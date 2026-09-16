@@ -1,0 +1,51 @@
+name: 🔦 Lighthouse CI — Performance Audit
+
+on:
+  deployment_status:
+  workflow_run:
+    workflows: ["🚀 CD — Deploy Staging"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL para auditar (ex: https://seu-projeto.web.app)'
+        required: true
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: 🔦 Lighthouse Audit
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install @lhci/cli
+        run: npm install -g @lhci/cli
+
+      - name: Run Lighthouse CI
+        run: lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          LHCI_URL: ${{ github.event.inputs.url || secrets.STAGING_URL }}
+
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 7
