@@ -35,7 +35,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Run npm audit (high severity)
         run: npm audit --audit-level=high --json > npm-audit-report.json || true
@@ -140,7 +140,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
@@ -172,7 +172,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Install license-checker
         run: npm install -g license-checker
