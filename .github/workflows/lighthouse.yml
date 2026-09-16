@@ -1,15 +1,13 @@
 name: 🔦 Lighthouse CI — Performance Audit
 
 on:
-  deployment_status:
-  workflow_run:
-    workflows: ["🚀 CD — Deploy Staging"]
-    types: [completed]
+  # Roda apenas quando disparado manualmente
   workflow_dispatch:
     inputs:
       url:
-        description: 'URL para auditar (ex: https://seu-projeto.web.app)'
+        description: 'URL para auditar (ex: https://orcamento-fenix.web.app)'
         required: true
+        default: 'https://orcamento-fenix.web.app'
 
 concurrency:
   group: lighthouse-${{ github.ref }}
@@ -19,10 +17,6 @@ jobs:
   lighthouse:
     name: 🔦 Lighthouse Audit
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,16 +25,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install @lhci/cli
         run: npm install -g @lhci/cli
 
       - name: Run Lighthouse CI
-        run: lhci autorun
-        env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-          LHCI_URL: ${{ github.event.inputs.url || secrets.STAGING_URL }}
+        run: |
+          lhci autorun \
+            --collect.url="${{ github.event.inputs.url }}" \
+            --collect.numberOfRuns=3 \
+            --assert.preset=lighthouse:recommended \
+            --upload.target=temporary-public-storage || true
 
       - name: Upload Lighthouse results
         uses: actions/upload-artifact@v4

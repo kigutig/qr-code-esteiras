@@ -1,5 +1,4 @@
 # Dependabot — Atualizações automáticas de dependências
-# Mantém npm packages e GitHub Actions sempre atualizados
 
 version: 2
 updates:
@@ -11,54 +10,38 @@ updates:
       day: "monday"
       time: "08:00"
       timezone: "America/Sao_Paulo"
-    open-pull-requests-limit: 10
-    # Agrupa updates para reduzir PRs
+    # Limitar a 3 PRs abertas ao mesmo tempo (evita flood de workflows)
+    open-pull-requests-limit: 3
+    # Agrupa TODOS os updates em um único PR por semana
     groups:
-      radix-ui:
+      all-dependencies:
         patterns:
-          - "@radix-ui/*"
-      testing:
-        patterns:
-          - "jest*"
-          - "@jest/*"
-          - "@testing-library/*"
-          - "babel-jest"
-          - "@babel/*"
-      firebase:
-        patterns:
-          - "firebase"
-          - "firebase-admin"
-      types:
-        patterns:
-          - "@types/*"
-      nextjs:
-        patterns:
-          - "next"
-          - "@next/*"
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     labels:
       - "dependencies"
       - "automated"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
-    # Ignorar versões major (breaking changes)
+    # Ignorar versões major (breaking changes) automaticamente
     ignore:
-      - dependency-name: "next"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react-dom"
+      - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
   # ── GitHub Actions ─────────────────────────────────────────────────────────
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "08:00"
+      interval: "monthly"
       timezone: "America/Sao_Paulo"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
+    groups:
+      all-actions:
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "github-actions"

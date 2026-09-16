@@ -5,18 +5,20 @@ on:
     branches: [develop]
   workflow_dispatch:
 
+# Não rodar em commits do Dependabot
 concurrency:
   group: cd-staging-${{ github.ref }}
   cancel-in-progress: true
 
 env:
   NODE_VERSION: '20'
-  FIREBASE_PROJECT: ${{ secrets.FIREBASE_PROJECT_ID }}
 
 jobs:
   deploy-staging:
     name: 🚀 Deploy → Firebase Staging
     runs-on: ubuntu-latest
+    # Só roda se o secret do Firebase estiver configurado
+    if: github.actor != 'dependabot[bot]' && secrets.FIREBASE_SERVICE_ACCOUNT != ''
     environment:
       name: staging
       url: ${{ steps.deploy.outputs.details_url }}
@@ -32,19 +34,19 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: Build Next.js (Staging)
         run: npm run build
         env:
           NODE_ENV: production
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY_STAGING }}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN_STAGING }}
-          NEXT_PUBLIC_FIREBASE_DATABASE_URL: ${{ secrets.NEXT_PUBLIC_FIREBASE_DATABASE_URL_STAGING }}
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_STAGING }}
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET_STAGING }}
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID_STAGING }}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID_STAGING }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_DATABASE_URL: ${{ secrets.NEXT_PUBLIC_FIREBASE_DATABASE_URL }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
 
       - name: Deploy to Firebase Hosting — Staging Channel
         id: deploy
@@ -52,29 +54,6 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: ${{ env.FIREBASE_PROJECT }}
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
           channelId: staging
           expires: 7d
-
-      - name: Comment on PR with staging URL
-        if: github.event_name == 'push'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const stagingUrl = '${{ steps.deploy.outputs.details_url }}';
-            const sha = context.sha.substring(0, 7);
-            // Encontra PRs abertas para este branch
-            const prs = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`
-            });
-            for (const pr of prs.data) {
-              await github.rest.issues.createComment({
-                issue_number: pr.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `## 🚀 Deploy de Staging Concluído!\n\n| Info | Valor |\n|---|---|\n| 🌐 URL | [Abrir Preview](${stagingUrl}) |\n| 📦 Commit | \`${sha}\` |\n| ⏰ Expira em | 7 dias |\n\n_Deploy realizado em: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}_`
-              });
-            }

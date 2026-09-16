@@ -1,8 +1,8 @@
 name: 🌐 CD — Deploy Produção
 
 on:
-  push:
-    branches: [main]
+  # Só roda manualmente ou via release — NUNCA automaticamente em push
+  # (evita deploys acidentais de commits do Dependabot ou PRs)
   release:
     types: [published]
   workflow_dispatch:
@@ -14,7 +14,7 @@ on:
 
 concurrency:
   group: cd-production
-  cancel-in-progress: false  # Nunca cancela deploy de produção
+  cancel-in-progress: false
 
 env:
   NODE_VERSION: '20'
@@ -25,17 +25,18 @@ jobs:
     name: ✅ Validar Deploy
     runs-on: ubuntu-latest
     if: |
-      github.event_name != 'workflow_dispatch' ||
-      github.event.inputs.confirm == 'deploy'
+      github.event_name == 'release' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm == 'deploy')
     steps:
       - name: Confirm deploy
-        run: echo "Deploy de produção autorizado para ${{ github.sha }}"
+        run: echo "Deploy de produção autorizado — ${{ github.sha }}"
 
   # ─── Deploy Produção ──────────────────────────────────────────────────────
   deploy-production:
     name: 🌐 Deploy → Firebase Produção
     runs-on: ubuntu-latest
     needs: validate
+    # Requer o secret do Firebase para prosseguir
     environment:
       name: production
       url: https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app
@@ -51,7 +52,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: Build Next.js (Produção)
         run: npm run build
@@ -74,24 +75,10 @@ jobs:
           projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
           channelId: live
 
-      - name: Create GitHub Release notes (on tag)
-        if: github.event_name == 'release'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            console.log(`✅ Deploy de produção concluído para versão ${context.ref}`);
-
       - name: Notify deploy success
         if: success()
         run: |
           echo "🚀 DEPLOY DE PRODUÇÃO CONCLUÍDO"
           echo "Commit: ${{ github.sha }}"
-          echo "Branch: ${{ github.ref_name }}"
+          echo "Ref: ${{ github.ref_name }}"
           echo "Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-
-      - name: Notify deploy failure
-        if: failure()
-        run: |
-          echo "❌ FALHA NO DEPLOY DE PRODUÇÃO"
-          echo "Commit: ${{ github.sha }}"
-          exit 1
