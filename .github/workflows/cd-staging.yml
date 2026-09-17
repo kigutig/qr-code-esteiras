@@ -17,8 +17,8 @@ jobs:
   deploy-staging:
     name: 🚀 Deploy → Firebase Staging
     runs-on: ubuntu-latest
-    # Só roda se o secret do Firebase estiver configurado
-    if: github.actor != 'dependabot[bot]' && secrets.FIREBASE_SERVICE_ACCOUNT != ''
+    # Não roda em PRs ou commits do Dependabot
+    if: github.actor != 'dependabot[bot]'
     environment:
       name: staging
       url: ${{ steps.deploy.outputs.details_url }}
