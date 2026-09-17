@@ -1,6 +1,6 @@
 /**
- * babel.config.js — Configuração Babel para Jest
- * Separado do jest.config para evitar problemas de resolução de módulos
+ * babel.jest.config.js — Configuração Babel exclusiva para Jest
+ * Nomeado separadamente para não desativar o SWC no Next.js build
  */
 
 module.exports = {

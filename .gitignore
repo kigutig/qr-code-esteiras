@@ -32,3 +32,4 @@ license-report.json
 # Build artifacts
 out/
 dist/
+*.tsbuildinfo
