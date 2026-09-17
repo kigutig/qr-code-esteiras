@@ -57,12 +57,12 @@
     "date-fns": "4.1.0",
     "embla-carousel-react": "8.6.0",
     "file-saver": "^2.0.5",
-    "firebase": "^9.22.1",
+    "firebase": "^12.19.0",
     "html2canvas": "^1.4.1",
     "input-otp": "1.4.2",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.564.0",
-    "next": "^16.2.6",
+    "next": "^16.3.5",
     "next-themes": "^0.4.6",
     "qrcode": "^1.5.4",
     "react": "^19",
@@ -75,7 +75,6 @@
     "sonner": "^1.7.1",
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",
-    "xlsx": "^0.18.5",
     "zod": "^3.24.1"
   },
   "devDependencies": {
